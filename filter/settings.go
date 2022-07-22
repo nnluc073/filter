@@ -138,7 +138,7 @@ func (s *Settings) Scope(db *gorm.DB, request *filterrequest.FilterReq, dest int
 	// 	paginator.DB = paginator.DB.Scopes(selectScope(schema.Table, s.getSelectableFields(schema.FieldsByDBName), false))
 	// }
 
-	paginator.DB = paginator.DB.Scopes(selectScope(schema.Table, selectFields, false))
+	paginator.DB = paginator.DB.Scopes(selectScope(schema.Table, selectFields, false, selectFields != nil && len(selectFields) != 0))
 
 	return paginator, paginator.Find()
 }
@@ -253,7 +253,7 @@ func (b *Blacklist) getSelectableFields(fields map[string]*schema.Field) []strin
 	return columns
 }
 
-func selectScope(table string, fields []string, override bool) func(*gorm.DB) *gorm.DB {
+func selectScope(table string, fields []string, override bool, customized bool) func(*gorm.DB) *gorm.DB {
 	return func(tx *gorm.DB) *gorm.DB {
 
 		if fields == nil {
@@ -264,7 +264,14 @@ func selectScope(table string, fields []string, override bool) func(*gorm.DB) *g
 		if len(fields) == 0 {
 			fieldsWithTableName = []string{"1"}
 		} else {
-			fieldsWithTableName = fields
+			fieldsWithTableName = make([]string, 0, len(fields))
+			if customized {
+				fieldsWithTableName = fields
+			} else {
+				for _, f := range fields {
+					fieldsWithTableName = append(fieldsWithTableName, tx.Statement.Quote(f))
+				}
+			}
 		}
 
 		if override {
