@@ -3,8 +3,8 @@ package filter
 import (
 	"net/url"
 
-	"github.com/nnluc073/fiberfilter/filter"
-	"github.com/nnluc073/fiberfilter/models"
+	"github.com/nnluc073/filter/filter"
+	"github.com/nnluc073/filter/models"
 
 	"github.com/valyala/fasthttp"
 )

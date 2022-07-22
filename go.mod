@@ -1,4 +1,4 @@
-module github.com/nnluc073/fiberfilter
+module github.com/nnluc073/filter
 
 go 1.18
 

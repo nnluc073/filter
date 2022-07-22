@@ -5,7 +5,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/nnluc073/fiberfilter/models"
+	"github.com/nnluc073/filter/models"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
