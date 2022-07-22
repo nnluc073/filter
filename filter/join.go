@@ -106,7 +106,7 @@ func joinScope(relationName string, rel *schema.Relationship, fields []string, b
 			}
 		}
 
-		return tx.Preload(relationName, selectScope(rel.FieldSchema.Table, columns, true))
+		return tx.Preload(relationName, selectScope(rel.FieldSchema.Table, columns, true, true))
 	}
 }
 
