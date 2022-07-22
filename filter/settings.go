@@ -109,7 +109,7 @@ func (s *Settings) Scope(db *gorm.DB, request *filterrequest.FilterReq, dest int
 		pageSize = request.Integer("per_page")
 	}
 
-	//db = db.Model(dest)
+	db = db.Model(dest)
 	paginator := database.NewPaginator(db, page, pageSize, dest)
 	paginator.UpdatePageInfo()
 
@@ -264,9 +264,8 @@ func selectScope(table string, fields []string, override bool) func(*gorm.DB) *g
 			fieldsWithTableName = []string{"1"}
 		} else {
 			fieldsWithTableName = make([]string, 0, len(fields))
-			tableName := tx.Statement.Quote(table) + "."
 			for _, f := range fields {
-				fieldsWithTableName = append(fieldsWithTableName, tableName+tx.Statement.Quote(f))
+				fieldsWithTableName = append(fieldsWithTableName, tx.Statement.Quote(f))
 			}
 		}
 
