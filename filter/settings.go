@@ -109,7 +109,7 @@ func (s *Settings) Scope(db *gorm.DB, request *filterrequest.FilterReq, dest int
 		pageSize = request.Integer("per_page")
 	}
 
-	db = db.Model(dest)
+	//db = db.Model(dest)
 	paginator := database.NewPaginator(db, page, pageSize, dest)
 	paginator.UpdatePageInfo()
 
