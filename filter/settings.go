@@ -76,13 +76,13 @@ func (s *Settings) Scope(db *gorm.DB, request *filterrequest.FilterReq, dest int
 
 	db = s.applyFilters(db, request, schema)
 
-	hasJoins := false
+	//hasJoins := false
 	if !s.DisableJoin && request.Has("join") {
 		joins, ok := request.Data["join"].([]*Join)
 		if ok {
 			selectCache := map[string][]string{}
 			for _, j := range joins {
-				hasJoins = true
+				//hasJoins = true
 				j.selectCache = selectCache
 				if s := j.Scopes(s, schema); s != nil {
 					db = db.Scopes(s...)
