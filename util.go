@@ -4,8 +4,7 @@ import (
 	"net/url"
 
 	"github.com/nnluc073/filter/filter"
-	"github.com/nnluc073/filter/models"
-
+	"github.com/nnluc073/filter/filterrequest"
 	"github.com/valyala/fasthttp"
 )
 
@@ -62,14 +61,14 @@ func flatten(dst map[string]interface{}, values url.Values) {
 
 }
 
-func ParseQuery(request *fasthttp.Request) (*models.FilterReq, error) {
+func ParseQuery(request *fasthttp.Request) (*filterrequest.FilterReq, error) {
 
 	filterData := make(map[string]interface{})
 
 	queryParams, err := url.ParseQuery(string(request.URI().QueryString()))
 	if err == nil {
 		flatten(filterData, queryParams)
-		return &models.FilterReq{Data: filterData}, nil
+		return &filterrequest.FilterReq{Data: filterData}, nil
 	}
 	return nil, err
 }

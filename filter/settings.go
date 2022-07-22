@@ -5,8 +5,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/nnluc073/filter/models"
-
+	"github.com/nnluc073/filter/filterrequest"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 	"goyave.dev/goyave/v4/database"
@@ -62,7 +61,7 @@ func parseModel(db *gorm.DB, model interface{}) (*schema.Schema, error) {
 }
 
 // Scope using the default FilterSettings. See `FilterSettings.Scope()` for more details.
-func Scope(db *gorm.DB, request *models.FilterReq, dest interface{}) (*database.Paginator, *gorm.DB) {
+func Scope(db *gorm.DB, request *filterrequest.FilterReq, dest interface{}) (*database.Paginator, *gorm.DB) {
 	return (&Settings{}).Scope(db, request, dest)
 }
 
@@ -70,7 +69,7 @@ func Scope(db *gorm.DB, request *models.FilterReq, dest interface{}) (*database.
 // and process pagination. Returns the resulting `*database.Paginator` and the `*gorm.DB` result,
 // which can be used to check for database errors.
 // The given request is expected to be validated using `ApplyValidation`.
-func (s *Settings) Scope(db *gorm.DB, request *models.FilterReq, dest interface{}) (*database.Paginator, *gorm.DB) {
+func (s *Settings) Scope(db *gorm.DB, request *filterrequest.FilterReq, dest interface{}) (*database.Paginator, *gorm.DB) {
 	schema, err := parseModel(db, dest)
 	if err != nil {
 		panic(err)
@@ -143,7 +142,7 @@ func (s *Settings) Scope(db *gorm.DB, request *models.FilterReq, dest interface{
 	return paginator, paginator.Find()
 }
 
-func (s *Settings) applyFilters(db *gorm.DB, request *models.FilterReq, schema *schema.Schema) *gorm.DB {
+func (s *Settings) applyFilters(db *gorm.DB, request *filterrequest.FilterReq, schema *schema.Schema) *gorm.DB {
 	if s.DisableFilter {
 		return db
 	}
@@ -189,7 +188,7 @@ func (s *Settings) applyFilters(db *gorm.DB, request *models.FilterReq, schema *
 	return db
 }
 
-func filterLen(request *models.FilterReq, name string) int {
+func filterLen(request *filterrequest.FilterReq, name string) int {
 	count := 0
 	if data, ok := request.Data[name]; ok {
 		if filters, ok := data.([]*Filter); ok {
@@ -212,7 +211,7 @@ func groupFilters(scopes []func(*gorm.DB) *gorm.DB, and bool) func(*gorm.DB) *go
 	}
 }
 
-func (s *Settings) applySearch(request *models.FilterReq, schema *schema.Schema) *Search {
+func (s *Settings) applySearch(request *filterrequest.FilterReq, schema *schema.Schema) *Search {
 	// Note: the search condition is not in a group condition (parenthesis)
 	query, ok := request.Data["search"].(string)
 	if ok {
