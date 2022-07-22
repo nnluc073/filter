@@ -264,10 +264,7 @@ func selectScope(table string, fields []string, override bool) func(*gorm.DB) *g
 		if len(fields) == 0 {
 			fieldsWithTableName = []string{"1"}
 		} else {
-			fieldsWithTableName = make([]string, 0, len(fields))
-			for _, f := range fields {
-				fieldsWithTableName = append(fieldsWithTableName, tx.Statement.Quote(f))
-			}
+			fieldsWithTableName = fields
 		}
 
 		if override {
