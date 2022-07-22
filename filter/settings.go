@@ -1,7 +1,6 @@
 package filter
 
 import (
-	"fmt"
 	"strings"
 	"sync"
 
@@ -61,15 +60,15 @@ func parseModel(db *gorm.DB, model interface{}) (*schema.Schema, error) {
 }
 
 // Scope using the default FilterSettings. See `FilterSettings.Scope()` for more details.
-func Scope(db *gorm.DB, request *filterrequest.FilterReq, dest interface{}) (*database.Paginator, *gorm.DB) {
-	return (&Settings{}).Scope(db, request, dest)
+func Scope(db *gorm.DB, request *filterrequest.FilterReq, dest interface{}, selectFields []string) (*database.Paginator, *gorm.DB) {
+	return (&Settings{}).Scope(db, request, dest, selectFields)
 }
 
 // Scope apply all filters, sorts and joins defined in the request's data to the given `*gorm.DB`
 // and process pagination. Returns the resulting `*database.Paginator` and the `*gorm.DB` result,
 // which can be used to check for database errors.
 // The given request is expected to be validated using `ApplyValidation`.
-func (s *Settings) Scope(db *gorm.DB, request *filterrequest.FilterReq, dest interface{}) (*database.Paginator, *gorm.DB) {
+func (s *Settings) Scope(db *gorm.DB, request *filterrequest.FilterReq, dest interface{}, selectFields []string) (*database.Paginator, *gorm.DB) {
 	schema, err := parseModel(db, dest)
 	if err != nil {
 		panic(err)
@@ -124,20 +123,22 @@ func (s *Settings) Scope(db *gorm.DB, request *filterrequest.FilterReq, dest int
 		}
 	}
 
-	if !s.DisableFields && request.Has("fields") {
-		fields := strings.Split(request.String("fields"), ",")
-		if hasJoins {
-			if len(schema.PrimaryFieldDBNames) == 0 {
-				paginator.DB.AddError(fmt.Errorf("Could not find primary key. Add `gorm:\"primaryKey\"` to your model"))
-				return nil, paginator.DB
-			}
-			fields = addPrimaryKeys(schema, fields)
-			fields = addForeignKeys(schema, fields)
-		}
-		paginator.DB = paginator.DB.Scopes(selectScope(schema.Table, cleanColumns(schema, fields, s.FieldsBlacklist), false))
-	} else {
-		paginator.DB = paginator.DB.Scopes(selectScope(schema.Table, s.getSelectableFields(schema.FieldsByDBName), false))
-	}
+	// if !s.DisableFields && request.Has("fields") {
+	// 	fields := strings.Split(request.String("fields"), ",")
+	// 	if hasJoins {
+	// 		if len(schema.PrimaryFieldDBNames) == 0 {
+	// 			paginator.DB.AddError(fmt.Errorf("Could not find primary key. Add `gorm:\"primaryKey\"` to your model"))
+	// 			return nil, paginator.DB
+	// 		}
+	// 		fields = addPrimaryKeys(schema, fields)
+	// 		fields = addForeignKeys(schema, fields)
+	// 	}
+	// 	paginator.DB = paginator.DB.Scopes(selectScope(schema.Table, cleanColumns(schema, fields, s.FieldsBlacklist), false))
+	// } else {
+	// 	paginator.DB = paginator.DB.Scopes(selectScope(schema.Table, s.getSelectableFields(schema.FieldsByDBName), false))
+	// }
+
+	paginator.DB = paginator.DB.Scopes(selectScope(schema.Table, selectFields, false))
 
 	return paginator, paginator.Find()
 }
