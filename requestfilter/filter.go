@@ -1,4 +1,4 @@
-package filterrequest
+package requestfilter
 
 import "fmt"
 

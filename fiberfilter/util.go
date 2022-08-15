@@ -1,4 +1,4 @@
-package filter
+package fiberfilter
 
 import (
 	"goyave.dev/goyave/v4/util/sliceutil"

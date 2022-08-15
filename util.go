@@ -3,15 +3,15 @@ package filter
 import (
 	"net/url"
 
-	"github.com/nnluc073/filter/filter"
-	"github.com/nnluc073/filter/filterrequest"
+	"github.com/nnluc073/filter/fiberfilter"
+	"github.com/nnluc073/filter/requestfilter"
 	"github.com/valyala/fasthttp"
 )
 
 func fMapping(values []string) interface{} {
-	var fData = make([]*filter.Filter, len(values))
+	var fData = make([]*fiberfilter.Filter, len(values))
 	for k, v := range values {
-		if data, err := filter.ParseFilter(v); err == nil {
+		if data, err := fiberfilter.ParseFilter(v); err == nil {
 			fData[k] = data
 
 		}
@@ -20,9 +20,9 @@ func fMapping(values []string) interface{} {
 }
 
 func jMapping(values []string) interface{} {
-	var fData = make([]*filter.Join, len(values))
+	var fData = make([]*fiberfilter.Join, len(values))
 	for k, v := range values {
-		if data, err := filter.ParseJoin(v); err == nil {
+		if data, err := fiberfilter.ParseJoin(v); err == nil {
 			fData[k] = data
 		}
 	}
@@ -30,9 +30,9 @@ func jMapping(values []string) interface{} {
 }
 
 func sMapping(values []string) interface{} {
-	var fData = make([]*filter.Sort, len(values))
+	var fData = make([]*fiberfilter.Sort, len(values))
 	for k, v := range values {
-		if data, err := filter.ParseSort(v); err == nil {
+		if data, err := fiberfilter.ParseSort(v); err == nil {
 			fData[k] = data
 		}
 	}
@@ -61,14 +61,14 @@ func flatten(dst map[string]interface{}, values url.Values) {
 
 }
 
-func ParseQuery(request *fasthttp.Request) (*filterrequest.FilterReq, error) {
+func ParseQuery(request *fasthttp.Request) (*requestfilter.FilterReq, error) {
 
 	filterData := make(map[string]interface{})
 
 	queryParams, err := url.ParseQuery(string(request.URI().QueryString()))
 	if err == nil {
 		flatten(filterData, queryParams)
-		return &filterrequest.FilterReq{Data: filterData}, nil
+		return &requestfilter.FilterReq{Data: filterData}, nil
 	}
 	return nil, err
 }
